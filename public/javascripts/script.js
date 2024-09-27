@@ -1,6 +1,10 @@
 // const socket = io('ws://localhost:5002')
 const socket = io();
 
+if (document.getElementById('chat-form')) {
+    document.getElementById('chat-form').addEventListener('submit', sendMessage);
+}
+
 function sendMessage(e) {
     e.preventDefault();
 
@@ -49,8 +53,6 @@ function sendMessage(e) {
 
     message.focus()
 }
-
-document.getElementById('chat-form').addEventListener('submit', sendMessage);
 
 // Listen for messages 
 socket.on("message", (data) => {

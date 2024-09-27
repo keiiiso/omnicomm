@@ -36,14 +36,22 @@
                                                 <li>
                                                     <strong><%= message.direction === 'inbound' ? 'From' : 'To' %>:</strong> <%= message.direction === 'inbound' ? message.from : message.to %><br>
                                                     <strong>Message:</strong> <%= message.body %>
+                                                    <% if (message.mediaUrl) { %>
+                                                        <br><strong>Attachment:</strong>
+                                                        <a href="<%= message.mediaUrl %>" target="_blank">View Attachment</a>
+                                                        <% if (message.mediaUrl.match(/\.(jpeg|jpg|gif|png)$/)) { %>
+                                                            <br><img src="<%= message.mediaUrl %>" alt="Attachment">
+                                                        <% } %>
+                                                    <% } %>
                                                 </li>
                                             <% }); %>
                                         </ul>
 
-                                        <form action="/sms/send-sms" method="POST">
-                                            <input type="tel" name="to" placeholder="To (Phone Number)" required>
-                                            <textarea name="body" placeholder="Message" required></textarea>
-                                            <button type="submit">Send</button>
+                                        <form action="/sms/send-sms" method="post" enctype="multipart/form-data" class="d-flex flex-column justify-content-start pt-3 mt-2">
+                                            <input type="tel" name="to" placeholder="To (Phone Number)" class="mb-3 form-control form-control-lg" required>
+                                            <textarea name="body" placeholder="Message" class="mb-3 form-control form-control-lg" required></textarea>
+                                            <input type="file" name="file" accept="image/*,video/*" class="mb-3 form-control form-control-lg">
+                                            <button type="submit" class="btn btn-primary">Send</button>
                                         </form>
 
                                     </div>

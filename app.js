@@ -11,6 +11,7 @@ const indexRouter = require('./routes/index');
 const mailRouter = require('./routes/mail');
 const authRouter = require('./routes/auth');
 const smsRouter = require('./routes/sms');
+const voiceRouter = require('./routes/voice');
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static('uploads'));
 app.use('/css', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')))
 app.use('/js', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')))
 
@@ -41,6 +43,7 @@ app.use('/', indexRouter);
 app.use('/mail', mailRouter);
 app.use('/auth', authRouter);
 app.use('/sms', smsRouter);
+app.use('/voice', voiceRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

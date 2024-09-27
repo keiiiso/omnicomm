@@ -1,12 +1,28 @@
 const express = require('express');
 const router = express.Router();
 const twilio = require('twilio');
+// const path = require('path');
+const multer = require('multer');
+
 require('dotenv').config();
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = twilio(accountSid, authToken);
 const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: async function (req, file, cb) {
+        // await cb(null, file.originalname path.extname(file.originalname));
+        await cb(null, file.originalname);
+    }
+});
+
+const upload = multer({ storage: storage });
+
 
 let messages = [];
 
@@ -18,24 +34,38 @@ router.get('/', function(req, res, next) {
     }
 });
 
-router.post('/send-sms', (req, res) => {
-    const { to, body } = req.body;
+router.post('/send-sms', upload.single('file'), async (req, res) => {
+    const {to, body} = req.body;
+    // const mediaUrl = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : null;
+    const mediaUrl = req.file ? [`https://big-cat-plainly.ngrok-free.app/uploads/${req.file.originalname}`] : null;
 
-    client.messages
-        .create({
-            body: body,
-            from: twilioPhoneNumber,
-            to: to
-        })
+    // console.log(req.file);
+    // console.log(mediaUrl);
+    const messageOptions = {
+        body: body,
+        from: twilioPhoneNumber,
+        to: to
+    };
+
+    if (mediaUrl) {
+        messageOptions.mediaUrl = [mediaUrl];
+    }
+
+    // console.log(messageOptions);
+
+
+    await client.messages
+        .create(messageOptions)
         .then(message => {
             messages.push({
                 sid: message.sid,
                 body: message.body,
                 from: message.from,
                 to: message.to,
-                direction: 'outbound'
+                direction: 'outbound',
+                mediaUrl: mediaUrl
             });
-            res.redirect('/');
+            res.redirect('/sms');
         })
         .catch(err => {
             console.error(err);
@@ -45,21 +75,23 @@ router.post('/send-sms', (req, res) => {
 
 router.post('/receive-sms', (req, res) => {
 
-    console.log('inbound message coming!');
+    // console.log('inbound message coming!');
 
-    const { Body, From } = req.body;
+    const { Body, From, MediaUrl } = req.body;
+
+    console.log(Body);
+    console.log(From);
 
     messages.push({
         body: Body,
         from: From,
         to: twilioPhoneNumber,
-        direction: 'inbound'
+        direction: 'inbound',
+        mediaUrl: MediaUrl
     });
 
     const twiml = new twilio.twiml.MessagingResponse();
-    twiml.message('Message received');
-    res.writeHead(200, { 'Content-Type': 'text/xml' });
-    res.end(twiml.toString());
+    res.type('text/xml').send(twiml.toString());
 });
 
 module.exports = router;

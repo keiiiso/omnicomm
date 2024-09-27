@@ -16,7 +16,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: process.env.NODE_ENV === "production" ? false : ["http://localhost:5002", "http://127.0.0.1:5002"]
+        origin: process.env.NODE_ENV === "production" ? false : ["http://localhost:5002", "http://127.0.0.1:5002", "https://big-cat-plainly.ngrok-free.app"]
     }
 });
 
