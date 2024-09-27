@@ -150,6 +150,7 @@ async function listMessages(auth) {
     const res = await gmail.users.messages.list({
         userId: 'me',
         maxResults: 5,
+        labelIds: ['CATEGORY_PERSONAL', 'UNREAD']
     });
 
     const list = res.data.messages;

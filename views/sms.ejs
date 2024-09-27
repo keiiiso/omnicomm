@@ -28,24 +28,19 @@
 
                                         <div class="chat-container pt-3 pe-3 overflow-y-auto"
                                              style="position: relative; height: 400px">
-                                            <!-- messages appear here -->
-                                        </div>
-
-                                        <ul>
-                                            <% messages.forEach(function(message) { %>
-                                                <li>
-                                                    <strong><%= message.direction === 'inbound' ? 'From' : 'To' %>:</strong> <%= message.direction === 'inbound' ? message.from : message.to %><br>
-                                                    <strong>Message:</strong> <%= message.body %>
-                                                    <% if (message.mediaUrl) { %>
-                                                        <br><strong>Attachment:</strong>
-                                                        <a href="<%= message.mediaUrl %>" target="_blank">View Attachment</a>
-                                                        <% if (message.mediaUrl.match(/\.(jpeg|jpg|gif|png)$/)) { %>
-                                                            <br><img src="<%= message.mediaUrl %>" alt="Attachment">
+                                            <ul>
+                                                <% messages.forEach(function(message) { %>
+                                                    <li>
+                                                        <strong><%= message.direction === 'inbound' ? 'From' : 'To' %>:</strong> <%= message.direction === 'inbound' ? message.from : message.to %><br>
+                                                        <strong>Message:</strong> <%= message.body %>
+                                                        <% if (message.mediaUrl) { %>
+                                                            <br><strong>Attachment:</strong>
+                                                            <a href="<%= message.mediaUrl %>" target="_blank">View Attachment</a>
                                                         <% } %>
-                                                    <% } %>
-                                                </li>
-                                            <% }); %>
-                                        </ul>
+                                                    </li>
+                                                <% }); %>
+                                            </ul>
+                                        </div>
 
                                         <form action="/sms/send-sms" method="post" enctype="multipart/form-data" class="d-flex flex-column justify-content-start pt-3 mt-2">
                                             <input type="tel" name="to" placeholder="To (Phone Number)" class="mb-3 form-control form-control-lg" required>
