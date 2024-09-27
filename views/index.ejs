@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('./head'); %>
+</head>
+<body class="text-bg-dark">
+
+<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    <header class="align-content-center">
+        <%- include('./header'); %>
+    </header>
+
+    <main class="flex-grow-1 d-flex flex-column justify-content-center">
+        <h1 class="text-center">Chat</h1>
+
+        <section>
+            <div class="container">
+
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <div class="card" id="chat3" style="border-radius: 15px;">
+                            <div class="card-body">
+
+                                <div class="row">
+
+                                    <div>
+
+                                        <div class="chat-container pt-3 pe-3 overflow-y-auto"
+                                             style="position: relative; height: 400px">
+                                             <!-- messages appear here -->
+                                        </div>
+
+                                        <form id="chat-form" class="d-flex flex-column justify-content-start pt-3 mt-2">
+                                            <input type="text" class="mb-3 form-control form-control-lg"
+                                                   id="message"
+                                                   placeholder="Type message">
+                                            <input type="file" class="mb-3 form-control form-control-lg"
+                                                   id="file">
+                                            <button type="submit" class="btn btn-primary">Send</button>
+                                        </form>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+</div>
+
+<script>
+    const currentUser = <%- JSON.stringify(user) %>;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,155 @@
+#!/usr/bin/env node
+
+const {app} = require('../app');
+const debug = require('debug')('omnicomm:server');
+const http = require('http');
+const {Server} = require('socket.io');
+const {sessionMiddleware} = require('../app');
+const fs = require('fs');
+const path = require('path');
+
+const port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+    cors: {
+        origin: process.env.NODE_ENV === "production" ? false : ["http://localhost:5002", "http://127.0.0.1:5002"]
+    }
+});
+
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+io.engine.use(sessionMiddleware);
+
+
+io.on('connection', (socket) => {
+    // console.log(`User ${socket.id} connected`);
+
+    // Access the session data from the socket's handshake
+    const session = socket.request.session;
+
+    // console.log(session);
+
+    // Check if the user is authenticated
+    if (session && session.passport) {
+        // console.log(`Authenticated user: ${session.passport.user}`);
+        socket.username = session.passport.user; // Store username for later use
+    } else {
+        // console.log('User is not authenticated');
+    }
+
+    // Handle incoming messages
+    socket.on('message', (data) => {
+        // console.log(data);
+        io.emit('message', {
+            text: data.text,
+            username: socket.username || 'Anonymous', // Use the stored username
+            time: data.time,
+            date: data.date
+        });
+    });
+
+    socket.on("upload", (file, callback) => {
+        // console.log(file); // <Buffer 25 50 44 ...>
+
+        // Define the upload directory
+        const uploadDir = path.join(__dirname, '../uploads');
+
+        // Ensure the uploads directory exists
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir);
+        }
+
+        // Generate a unique filename or use a timestamp
+        const filename = `${file.name}`;
+
+        // Save the content to the disk
+        const filePath = path.join(uploadDir, filename);
+
+        fs.writeFile(filePath, file.file, (err) => {
+            if (err) {
+                // callback({ message: "failure" });
+                console.log(err)
+                return;
+            }
+
+            // Emit an event to notify all clients about the uploaded file
+            io.emit('message', {
+                name: filename,
+                type: file.type,
+                file: file.file,
+                username: socket.username || 'Anonymous',
+                time: file.time,
+                date: file.date,
+            });
+
+            // callback({ message: "success" });
+        });
+    });
+
+    socket.on('disconnect', () => {
+        // console.log(`User ${socket.id} disconnected`);
+    });
+});
+
+function normalizePort(val) {
+    const port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
+
+    if (port >= 0) {
+        // port number
+        return port;
+    }
+
+    return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+
+    const bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+    const addr = server.address();
+    const bind = typeof addr === 'string'
+        ? 'pipe ' + addr
+        : 'port ' + addr.port;
+    debug('Listening on ' + bind);
+}

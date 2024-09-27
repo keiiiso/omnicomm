@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('./head'); %>
+</head>
+
+<body class="text-bg-dark">
+
+
+<main class="form-signin m-auto">
+    <form action="/auth" method="post">
+
+        <div class="mb-3">
+            <input type="text" name="username" class="form-control" id="floatingInput" placeholder="Username">
+        </div>
+        <div class="mb-3">
+            <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Password">
+        </div>
+
+        <button class="btn btn-primary w-100 py-2" type="submit">Sign in</button>
+    </form>
+</main>
+
+</body>
+
+</html>

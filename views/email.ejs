@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('./head'); %>
+</head>
+<body class="text-center text-bg-dark">
+
+<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    <header class="mb-auto">
+        <%- include('./header'); %>
+    </header>
+
+    <main class="flex-grow-1 d-flex flex-column justify-content-center">
+        <h1>Inbox</h1>
+
+        <div>
+            <a class="btn btn-primary" href="/mail/compose" role="button">Compose</a>
+            <a class="btn btn-secondary" href="/mail" role="button">Refresh</a>
+        </div>
+
+        <div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5">
+            <div class="list-group card">
+                <% messages.forEach((message, index) => { %>
+                    <li>
+                        <a onclick="showMessage(<%= index %>)" class="list-group-item list-group-item-action d-flex gap-3 py-3"
+                           aria-current="true">
+                            <div class="d-flex gap-2 w-100 justify-content-between align-items-start">
+                                <div class="text-start">
+                                    <h6 class="mb-0"><%= message.subject %></h6>
+                                    <p class="mb-0 opacity-75"><%= message.sender %></p>
+                                </div>
+                                <small class="opacity-50 text-nowrap"><%= message.date %></small>
+                            </div>
+                        </a>
+                    </li>
+                <% }); %>
+            </div>
+
+            <div id="message-card" class="card d-block col-5 text-start">
+                <div class="card-body">
+                    <h5 class="card-title" id="message-subject">Subject</h5>
+                    <h6 class="card-subtitle mb-2 text-muted" id="message-from">From: </h6>
+                    <p class="card-text" id="message-body">Clicking on a message will make the content appear here.</p>
+
+                    <div id="message-attachment">
+                        <h6>Attachment:</h6>
+                        <div id="attachment">
+                            <!-- Attachments will be dynamically added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</div>
+
+<script>
+    const messages = <%- JSON.stringify(messages) %>;
+
+    function showMessage(index) {
+        const message = messages[index];
+
+        // Update the card with message content
+        document.getElementById('message-subject').innerText = message.subject;
+        document.getElementById('message-from').innerText = 'From: ' + message.sender;
+        document.getElementById('message-body').innerHTML = message.body;
+
+        const attachment = document.getElementById('attachment');
+        attachment.innerHTML = '';
+
+        // console.log(message);
+
+        if (message.attachment) {
+                // console.log(message.attachment);
+            const downloadLink = document.createElement('a');
+            downloadLink.href = `/mail/download/${message.attachment.messageId}/${message.attachment.attachmentId}/${message.attachment.filename}`;
+            downloadLink.download = message.attachment.filename; // Set the filename for download
+            downloadLink.innerText = `Download ${message.attachment.filename}`; // Link text
+
+            // Append the link to the attachment div
+            attachment.appendChild(downloadLink);
+        } else {
+            attachment.innerHTML = '<p>No attachments available.</p>';
+        }
+    }
+</script>
+
+</body>
+</html>

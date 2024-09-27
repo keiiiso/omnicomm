@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('./head'); %>
+</head>
+<body class="text-bg-dark">
+
+<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    <header class="mb-auto">
+        <%- include('./header'); %>
+    </header>
+
+    <main class="flex-grow-1 d-flex flex-column justify-content-center">
+        <h1>New Message</h1>
+
+        <div>
+            <a class="btn btn-secondary" href="/mail" role="button">Back to Inbox</a>
+        </div>
+
+
+        <div class="my-3">
+            <form action="/mail/compose" enctype="multipart/form-data" method="post">
+                <div class="mb-3">
+                    <input type="email" name="recipient" class="form-control" id="exampleFormControlInput1"
+                           placeholder="To: name@example.com">
+                </div>
+
+                <div class="mb-3">
+                    <input type="text" name="subject" class="form-control" id="exampleFormControlInput2"
+                           placeholder="Subject">
+                </div>
+
+                <div class="mb-3">
+                    <textarea name="body" class="form-control" id="exampleFormControlTextarea1" placeholder="Message"
+                              rows="3"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <input name="file" type="file" class="form-control" id="exampleFormControlInput3">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+
+    </main>
+
+
+</div>
+</body>
+</html>
